@@ -28,7 +28,7 @@ class syntax_plugin_upload extends DokuWiki_Syntax_Plugin {
 
         list($target, $option) = explode('|', $match, 2);
 
-        if (strpos($option, 'OVERWRITE')  !== false) $option['overwite'] = 1;
+        if (strpos($option, 'OVERWRITE')  !== false) $option['overwrite'] = 1;
         if (strpos($option, 'RENAMEABLE') !== false) $option['renameable'] = 1;
 
         $ns = trim($target);
@@ -53,8 +53,8 @@ class syntax_plugin_upload extends DokuWiki_Syntax_Plugin {
         if ($format == 'xhtml') {
             //check auth
             $auth = auth_quickaclcheck($data['uploadns'] . ':*');
-            if($auth >= AUTH_UPLOAD) {
-                $renderer->doc .= $this->_uploadform($uploadns, $auth, $doptions);
+            if ($auth >= AUTH_UPLOAD) {
+                $renderer->doc .= $this->_uploadform($uploadns, $auth, $options);
 //				$renderer->info['cache'] = false;
             }
             return true;
