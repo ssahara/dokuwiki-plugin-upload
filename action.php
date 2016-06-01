@@ -27,7 +27,7 @@ class action_plugin_upload extends DokuWiki_Action_Plugin {
         }
 
         $namespace = p_get_metadata($event->data->page, 'has_upload_form');
-        if(!empty($namespace)) {
+        if (!empty($namespace)) {
             $event->data->key .= '|ACL' . auth_quickaclcheck($namespace);
             $event->data->cache = getCacheName($event->data->key, $event->data->ext);
         }
@@ -49,10 +49,10 @@ class action_plugin_upload extends DokuWiki_Action_Plugin {
         }
 
         // handle upload
-        if($_FILES['upload']['tmp_name']) {
+        if ($_FILES['upload']['tmp_name']) {
             $_POST['mediaid'] = $INPUT->post->str('new_name');
             $JUMPTO = media_upload($NS, $AUTH);
-            if($JUMPTO) {
+            if ($JUMPTO) {
                 $NS = getNS($JUMPTO);
                 $ID = $INPUT->post->str('page');
                 $NS = getNS($ID);

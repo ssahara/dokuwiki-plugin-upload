@@ -25,39 +25,44 @@ class syntax_plugin_upload extends DokuWiki_Syntax_Plugin {
         global $ID;
 
         $match = substr($match, 9, -2);
-        $matches = explode('|', $match, 2);
-        $o = explode('|', $matches[1]);
 
-        $options['overwrite'] = in_array('OVERWRITE', $o);
-        $options['renameable'] = in_array('RENAMEABLE', $o);
+        list($target, $option) = explode('|', $match, 2);
 
-        $ns = $matches[0];
+        if (strpos($option, 'OVERWRITE')  !== false) $option['overwite'] = 1;
+        if (strpos($option, 'RENAMEABLE') !== false) $option['renameable'] = 1;
 
-        if($ns == '@page@') {
-            $ns = $ID;
-        } else if($ns == '@current@') {
-            $ns = getNS($ID);
-        } else {
-            resolve_pageid(getNS($ID), $ns, $exists);
+        $ns = trim($target);
+        switch ($ns) {
+            case '@page@':
+                $ns = $ID; break;
+            case '@current@':
+                $ns = getNS($ID); break;
+            default:
+                resolve_pageid(getNS($ID), $ns, $exists);
         }
+        $data = array('uploadns' => $ns, 'options' => $options);
 
-        return array('uploadns' => hsc($ns), 'para' => $options);
+        return array($state, $data);
     }
 
-    function render($mode, Doku_Renderer $renderer, $data) {
-        if($mode == 'xhtml') {
+    function render($format, Doku_Renderer $renderer, $indata) {
+
+        list($state, $data) = $indata;
+        list($uploadns, $options) = $data;
+
+        if ($format == 'xhtml') {
             //check auth
             $auth = auth_quickaclcheck($data['uploadns'] . ':*');
-
             if($auth >= AUTH_UPLOAD) {
-                $renderer->doc .= $this->upload_plugin_uploadform($data['uploadns'], $auth, $data['para']);
+                $renderer->doc .= $this->_uploadform($uploadns, $auth, $doptions);
 //				$renderer->info['cache'] = false;
             }
             return true;
-        } else if($mode == 'metadata') {
-            $renderer->meta['has_upload_form'] = $data['uploadns'] . ':*';
+        } elseif ($format == 'metadata') {
+            $renderer->meta['has_upload_form'] = $uploadns . ':*';
             return true;
         }
+
         return false;
     }
 
@@ -69,12 +74,11 @@ class syntax_plugin_upload extends DokuWiki_Syntax_Plugin {
      * @author    Franz Häfner <fhaefner@informatik.tu-cottbus.de>
      * @author    Randolf Rotta <rrotta@informatik.tu-cottbus.de>
      */
-    function upload_plugin_uploadform($ns, $auth, $options) {
-        global $ID;
-        global $lang;
+    protected function _uploadform($ns, $auth, $options) {
+        global $ID, $lang;
         $html = '';
 
-        if($auth < AUTH_UPLOAD) return;
+        if ($auth < AUTH_UPLOAD) return;
 
         $params = array();
         $params['id'] = 'upload_plugin';
@@ -90,13 +94,13 @@ class syntax_plugin_upload extends DokuWiki_Syntax_Plugin {
         $form->addHidden('page', hsc($ID));
         $form->addHidden('ns', hsc($ns));
         $form->addElement(form_makeFileField('upload', $lang['txt_upload'] . ':', 'upload__file'));
-        if($options['renameable']) {
+        if ($options['renameable']) {
             // don't name this field here "id" because it is misinterpreted by DokuWiki if the upload form is not in media manager
             $form->addElement(form_makeTextField('new_name', '', $lang['txt_filename'] . ':', 'upload__name'));
         }
 
-        if($auth >= AUTH_DELETE) {
-            if($options['overwrite']) {
+        if ($auth >= AUTH_DELETE) {
+            if ($options['overwrite']) {
                 //$form->addElement(form_makeCheckboxField('ow', 1, $lang['txt_overwrt'], 'dw__ow', 'check'));
                 // circumvent wrong formatting in doku_form
                 $form->addElement(
@@ -110,9 +114,9 @@ class syntax_plugin_upload extends DokuWiki_Syntax_Plugin {
         $form->addElement(form_makeButton('submit', '', $lang['btn_upload']));
         $form->endFieldset();
 
-        $html .= '<div class="upload_plugin"><p>' . NL;
+        $html .= '<div class="upload_plugin">' . NL;
         $html .= $form->getForm();
-        $html .= '</p></div>' . NL;
+        $html .= '</div>' . NL;
         return $html;
     }
 }
