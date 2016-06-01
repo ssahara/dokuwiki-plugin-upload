@@ -3,5 +3,5 @@ author Christian Moll, Franz Häfner, Randolf Rotta
 email christian [at] chrmoll [dot] de, fhaefner [at] informatik [dot] tu [dash] cottbus [dot] de
 date 2016-06-01
 name Upload Plugin
-desc Includes file upload into wikipages depending on the user rights.
+desc Includes file upload form into wikipages depending on the user rights.
 url http://dokuwiki.org/plugin:upload
