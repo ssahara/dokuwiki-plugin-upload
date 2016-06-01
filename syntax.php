@@ -9,37 +9,13 @@
  * @author    Randolf Rotta <rrotta@informatik.tu-cottbus.de>
  */
 
-if(!defined('NL')) define('NL', "\n");
-if(!defined('DOKU_INC')) define('DOKU_INC', dirname(__FILE__) . '/../../');
-if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN', DOKU_INC . 'lib/plugins/');
-require_once(DOKU_PLUGIN . 'syntax.php');
-require_once(DOKU_INC . 'inc/media.php');
-require_once(DOKU_INC . 'inc/auth.php');
-
-require_once(DOKU_INC . 'inc/infoutils.php');
+if(!defined('DOKU_INC')) die();
 
 class syntax_plugin_upload extends DokuWiki_Syntax_Plugin {
 
-    function getInfo() {
-        return array(
-            'author' => 'Franz Häfner',
-            'email' => 'fhaefner@informatik.tu-cottbus.de',
-            'date' => '2010-09-07',
-            'name' => 'upload plugin',
-            'desc' => 'upload plugin can add a link to the media manager in your wikipage.
-            			Basic syntax: {{upload>namespace|option1|option2}}
-				Use @page@ as namespage to use ID of the actual page as namespace or @current@ to use the namespace the current page is in.',
-            'url' => 'http://wiki.splitbrain.org/plugin:upload',
-        );
-    }
-
-    function getType() {
-        return 'substition';
-    }
-
-    function getSort() {
-        return 32;
-    }
+    function getType()  { return 'substition'; }
+    function getPType() { return 'block'; }
+    function getSort()  { return 32; }
 
     function connectTo($mode) {
         $this->Lexer->addSpecialPattern('\{\{upload>.+?\}\}', $mode, 'plugin_upload');
