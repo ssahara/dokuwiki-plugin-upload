@@ -37,7 +37,7 @@ class action_plugin_upload extends DokuWiki_Action_Plugin {
         global $INPUT, $lang;
 
         // get namespace to display (either direct or from deletion order)
-        $NS = $INPUT->post->('ns');
+        $NS = $INPUT->post->str('ns');
         if (!$NS) return;
         $NS = cleanID($NS);
 
