@@ -1,3 +1,7 @@
+div.upload_plugin {
+    margin-bottom: 1em;
+}
+
 div.dokuwiki form.upload__plugin {
     width: 100%;
     text-align: center;
@@ -35,8 +39,3 @@ div.dokuwiki form.upload__plugin input.button {
     margin: 5px;
 }
 
-div.dokuwiki form.upload__plugin input.button {
-    float: left;
-    display: block;
-    margin: 5px;
-}
