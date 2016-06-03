@@ -25,37 +25,40 @@ class syntax_plugin_upload extends DokuWiki_Syntax_Plugin {
         global $ID;
 
         $match = substr($match, 9, -2);
-        $matches = explode('|', $match, 2);
-        $o = explode('|', $matches[1]);
+        list($target, $option) = explode('|', $match, 2);
 
-        $options['overwrite'] = in_array('OVERWRITE', $o);
-        $options['renameable'] = in_array('RENAMEABLE', $o);
+        if (strpos($option, 'OVERWRITE') !== false) $options['overwrite'] = 1;
+        if (strpos($option, 'RENAMEABLE') !== false) $options['renameable'] = 1;
 
-        $ns = $matches[0];
-
-        if ($ns == '@page@') {
-            $ns = $ID;
-        } elseif ($ns == '@current@') {
-            $ns = getNS($ID);
-        } else {
-            resolve_pageid(getNS($ID), $ns, $exists);
+        $ns = trim($target);
+        switch ($ns) {
+            case '@page@':
+                $ns = $ID;
+                break;
+            case '@current@':
+                $ns = getNS($ID);
+                break;
+            default:
+                resolve_pageid(getNS($ID), $ns, $exists);
         }
 
-        return array('uploadns' => hsc($ns), 'para' => $options);
+        return array($state, $ns, $options);
     }
 
     function render($format, Doku_Renderer $renderer, $data) {
+        list($state, $uploadns, $options) = $data;
+
         if($format == 'xhtml') {
             //check auth
-            $auth = auth_quickaclcheck($data['uploadns'] . ':*');
+            $auth = auth_quickaclcheck($uploadns . ':*');
 
             if ($auth >= AUTH_UPLOAD) {
-                $renderer->doc .= $this->upload_plugin_uploadform($data['uploadns'], $auth, $data['para']);
+                $renderer->doc .= $this->_uploadform($uploadns, $auth, $options);
 //				$renderer->info['cache'] = false;
             }
             return true;
         } elseif ($format == 'metadata') {
-            $renderer->meta['has_upload_form'] = $data['uploadns'] . ':*';
+            $renderer->meta['has_upload_form'] = $uploadns . ':*';
             return true;
         }
         return false;
@@ -69,7 +72,7 @@ class syntax_plugin_upload extends DokuWiki_Syntax_Plugin {
      * @author    Franz Häfner <fhaefner@informatik.tu-cottbus.de>
      * @author    Randolf Rotta <rrotta@informatik.tu-cottbus.de>
      */
-    function upload_plugin_uploadform($ns, $auth, $options) {
+    protected function _uploadform($ns, $auth, $options) {
         global $ID, $lang;
         $html = '';
 
