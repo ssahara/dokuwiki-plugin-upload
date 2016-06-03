@@ -19,7 +19,7 @@ class action_plugin_upload extends DokuWiki_Action_Plugin {
         $controller->register_hook('ACTION_HEADERS_SEND', 'BEFORE', $this, '_hook_function_upload');
     }
 
-    function _hook_function_cache(&$event, $param) {
+    function _hook_function_cache(Doku_Event $event, $param) {
         if (isset($_FILES['upload']['tmp_name'])) {
             $event->preventDefault();
             $event->stopPropagation();
@@ -33,7 +33,7 @@ class action_plugin_upload extends DokuWiki_Action_Plugin {
         }
     }
 
-    function _hook_function_upload(&$event, $param) {
+    function _hook_function_upload(Doku_Event $event, $param) {
         global $INPUT, $lang;
         // get namespace to display (either direct or from deletion order)
         $NS = $INPUT->post->str('ns');
